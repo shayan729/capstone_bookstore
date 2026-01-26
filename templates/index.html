@@ -1,41 +1,160 @@
 {% extends 'base.html' %}
 
-{% block title %}Welcome - AWS Capstone Project{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="hero">
-        <h1>AWS Capstone Project Deployment</h1>
-        <p>Empowering students to build and deploy cloud-native applications using modern AWS services.</p>
-        {% if not session.get('username') and not session.get('admin') %}
-        <div class="mt-4">
-            <a href="{{ url_for('login') }}" class="btn btn-primary">App Login</a>
-            <a href="{{ url_for('signup') }}" class="btn btn-secondary" style="margin-left: 1rem;">App Signup</a>
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="hero-title display-4 fw-bold">Discover Your Next Great Read</h1>
+        <p class="hero-subtitle mx-auto lead">Enhancing accessibility to literature and educational resources for our
+            local community and students.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="#" class="btn btn-primary btn-lg px-5 rounded-pill">Browse Catalog</a>
+            {% if not session.get('username') %}
+            <a href="{{ url_for('signup') }}" class="btn btn-outline-primary btn-lg px-5 rounded-pill">Sign Up</a>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
+</section>
 
-    <section class="features">
-        <div class="feature-card">
-            <h3>About the Project</h3>
-            <p>This platform allows students to enroll in AWS projects built with Python (Flask), HTML, CSS, and JS.
-                Experience the full lifecycle of cloud deployment.</p>
+<!-- Featured Books Carousel -->
+<section class="section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Featured Books</h2>
+        <div id="featuredBooksCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for chunk in featured_books|batch(4) %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <div class="row g-4">
+                        {% for book in chunk %}
+                        <div class="col-md-3">
+                            <div class="card book-card h-100">
+                                <img src="{{ book.image }}" class="card-img-top" alt="{{ book.title }}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate">{{ book.title }}</h5>
+                                    <p class="text-muted small mb-2">{{ book.author }}</p>
+                                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-primary">${{ book.price }}</span>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-cart-plus"></i>
+                                            Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredBooksCarousel"
+                data-bs-slide="prev" style="width: 5%;">
+                <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredBooksCarousel"
+                data-bs-slide="next" style="width: 5%;">
+                <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-        <div class="feature-card">
-            <h3>AWS Services</h3>
-            <p>We leverage key AWS services to build robust applications:</p>
-            <ul>
-                <li><strong>EC2:</strong> For scalable application deployment.</li>
-                <li><strong>DynamoDB:</strong> Fast NoSQL database for data storage.</li>
-                <li><strong>SNS:</strong> For reliable activity notifications.</li>
-                <li><strong>IAM:</strong> For secure access management.</li>
-            </ul>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Us</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="p-4 h-100 bg-white rounded shadow-sm">
+                    <div class="feature-icon"><i class="bi bi-book"></i></div>
+                    <h5>Wide Selection</h5>
+                    <p class="text-muted small">Thousands of titles across all genres.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 h-100 bg-white rounded shadow-sm">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h5>Secure Ordering</h5>
+                    <p class="text-muted small">Your data and payments are always safe.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 h-100 bg-white rounded shadow-sm">
+                    <div class="feature-icon"><i class="bi bi-truck"></i></div>
+                    <h5>Fast Delivery</h5>
+                    <p class="text-muted small">Get your books delivered to your doorstep.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 h-100 bg-white rounded shadow-sm">
+                    <div class="feature-icon"><i class="bi bi-people"></i></div>
+                    <h5>Community</h5>
+                    <p class="text-muted small">Supporting local readers and students.</p>
+                </div>
+            </div>
         </div>
-        <div class="feature-card">
-            <h3>Student Enrollment</h3>
-            <p>Seamless enrollment process for students. Track your progress, view project details, and download
-                resources to kickstart your cloud journey.</p>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Browse by Category</h2>
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-2 col-6">
+                <a href="#" class="btn btn-outline-secondary w-100 py-3 fw-bold">Fiction</a>
+            </div>
+            <div class="col-md-2 col-6">
+                <a href="#" class="btn btn-outline-secondary w-100 py-3 fw-bold">Non-Fiction</a>
+            </div>
+            <div class="col-md-2 col-6">
+                <a href="#" class="btn btn-outline-secondary w-100 py-3 fw-bold">Academic</a>
+            </div>
+            <div class="col-md-2 col-6">
+                <a href="#" class="btn btn-outline-secondary w-100 py-3 fw-bold">Children's</a>
+            </div>
+            <div class="col-md-2 col-6">
+                <a href="#" class="btn btn-outline-secondary w-100 py-3 fw-bold">Science</a>
+            </div>
         </div>
-    </section>
-</div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">What Readers Say</h2>
+        <div class="row g-4">
+            {% for review in testimonials %}
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <p class="testimonial-text mb-3">"{{ review.text }}"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="customer-info">
+                            <h6 class="customer-name mb-0">{{ review.name }}</h6>
+                            <small class="text-muted">{{ review.role }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center bg-primary text-white p-5 rounded-3 shadow">
+                <h3 class="text-white mb-3">Stay Updated</h3>
+                <p class="mb-4">Join our newsletter to get the latest book releases and exclusive discounts.</p>
+                <form class="d-flex justify-content-center gap-2">
+                    <input type="email" class="form-control w-50" placeholder="Enter your email">
+                    <button class="btn btn-light fw-bold">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

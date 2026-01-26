@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - BookStore Manager{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-primary">Get in Touch</h1>
+        <p class="lead text-muted">Have a question or just want to say hi? We'd love to hear from you.</p>
+    </div>
+
+    {% if success %}
+    <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>Thank you!</strong> We've received your message and will respond within 24 hours.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <div class="row g-5">
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('contact') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-bold small text-muted text-uppercase">Full
+                                Name</label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name" required
+                                placeholder="John Doe">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-bold small text-muted text-uppercase">Email
+                                    Address</label>
+                                <input type="email" class="form-control form-control-lg" id="email" name="email"
+                                    required placeholder="name@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-bold small text-muted text-uppercase">Phone
+                                    (Optional)</label>
+                                <input type="tel" class="form-control form-control-lg" id="phone" name="phone"
+                                    placeholder="+91 98765 43210">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject"
+                                class="form-label fw-bold small text-muted text-uppercase">Subject</label>
+                            <select class="form-select form-select-lg" id="subject" name="subject">
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Order Issue">Order Issue</option>
+                                <option value="Book Request">Book Request</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="Partnership">Partnership</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="message"
+                                class="form-label fw-bold small text-muted text-uppercase">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required
+                                placeholder="How can we help you today?"></textarea>
+                            <div class="form-text text-end">Max 500 characters</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="col-lg-5">
+            <!-- Address Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-square bg-primary text-white rounded-3 me-3 d-flex align-items-center justify-content-center"
+                            style="width: 48px; height: 48px;">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Visit Us</h5>
+                    </div>
+                    <p class="mb-3">123 Bookworm Avenue, Knowledge Park<br>Mumbai, Maharashtra 400001</p>
+                    <div class="map-container rounded overflow-hidden mb-3" style="height: 150px;">
+                        <!-- Placeholder Map -->
+                        <img src="https://placehold.co/600x200/e9ecef/5D4037?text=Map+Location"
+                            class="w-100 h-100 object-fit-cover" alt="Map">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Contact Details</h5>
+                    <ul class="list-unstyled mb-0 d-grid gap-3">
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-envelope text-primary me-3 fs-5"></i>
+                            <a href="mailto:support@bookstoremanager.com"
+                                class="text-decoration-none text-dark">support@bookstoremanager.com</a>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-telephone text-primary me-3 fs-5"></i>
+                            <a href="tel:+919876543210" class="text-decoration-none text-dark">+91 98765 43210</a>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-whatsapp text-success me-3 fs-5"></i>
+                            <a href="#" class="text-decoration-none text-dark">Chat on WhatsApp</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Business Hours -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Business Hours</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Monday - Saturday</span>
+                        <span class="fw-bold">9:00 AM - 7:00 PM</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Sunday</span>
+                        <span class="fw-bold text-muted">10:00 AM - 5:00 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Socials -->
+            <div class="d-flex gap-2">
+                <a href="#" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="row justify-content-center mt-5 pt-5">
+        <div class="col-lg-8">
+            <h3 class="text-center mb-4">Frequently Asked Questions</h3>
+            <div class="accordion accordion-flush" id="faqAccordion">
+                <div class="accordion-item shadow-sm mb-3 rounded border">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq1">
+                            How do I track my order?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Once your order is shipped, you will receive a tracking link via email. You can also view
+                            your order status in your account dashboard.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item shadow-sm mb-3 rounded border">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq2">
+                            What is your return policy?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We accept returns within 7 days of delivery for damaged or incorrect items. Please contact
+                            support with your order ID.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item shadow-sm mb-3 rounded border">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq3">
+                            Do you offer student discounts?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes! Students can get a 15% discount by verifying their student ID during signup or
+                            checkout.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item shadow-sm mb-3 rounded border">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq4">
+                            How long does delivery take?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Standard delivery takes 3-5 business days. Express shipping options are available at
+                            checkout for approved pincodes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

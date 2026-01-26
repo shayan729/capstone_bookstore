@@ -1,44 +1,173 @@
 {% extends 'base.html' %}
 
-{% block title %}About - AWS Capstone Project{% endblock %}
+{% block title %}About Us - BookStore Manager{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 900px; margin: 0 auto;">
-    <div class="card p-4">
-        <h1 class="text-center mb-4" style="color: var(--primary-color);">About Us</h1>
-        <p class="lead text-center mb-4" style="font-size: 1.2rem; color: var(--secondary-color);">
-            Welcome to the <strong>AWS Capstone Project Deployment</strong> portal. This platform is designed to bridge
-            the
-            gap between theoretical knowledge and practical cloud implementation.
-        </p>
+<!-- Hero Section -->
+<section class="hero-section text-center position-relative overflow-hidden">
+    <div class="container position-relative z-1">
+        <h1 class="hero-title display-4 fw-bold">Empowering Readers, Building Communities</h1>
+        <p class="hero-subtitle mx-auto lead">Your trusted local bookstore serving readers and students since 2010.</p>
+    </div>
+    <!-- Decor element (optional) -->
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+        style="background: radial-gradient(circle at center, rgba(239,235,233,0.8) 0%, rgba(239,235,233,1) 100%); z-index: 0;">
+    </div>
+</section>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
-
-        <h3>Our Mission</h3>
-        <p class="mb-4">To provide students with a hands-on environment where they can deploy real-world applications
-            using industry-standard AWS services.</p>
-
-        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
-            <div>
-                <h3>Tech Stack Details</h3>
-                <ul style="padding-left: 1.2rem;">
-                    <li class="mb-2"><strong>Frontend:</strong> HTML, CSS, JavaScript for responsive UIs.</li>
-                    <li class="mb-2"><strong>Backend:</strong> Python Flask for robust API logic.</li>
-                    <li class="mb-2"><strong>Cloud Infrastructure:</strong> Amazon Web Services (AWS).</li>
-                </ul>
+<!-- Our Story -->
+<section class="section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="https://placehold.co/600x400?text=Our+Bookstore" class="img-fluid rounded shadow"
+                    alt="Our Bookstore">
             </div>
-
-            <div>
-                <h3>Why AWS?</h3>
-                <p>AWS offers the deepest set of cloud services. Our projects utilize:</p>
-                <ul style="padding-left: 1.2rem;">
-                    <li class="mb-2"><strong>IAM:</strong> Secure access management.</li>
-                    <li class="mb-2"><strong>DynamoDB:</strong> Flexible NoSQL database.</li>
-                    <li class="mb-2"><strong>Amazon SNS:</strong> Managed messaging service.</li>
-                    <li class="mb-2"><strong>Amazon EC2:</strong> Scalable compute capacity.</li>
-                </ul>
+            <div class="col-lg-6">
+                <h2 class="mb-4">Our Story</h2>
+                <p class="mb-3 lead fst-italic text-primary">"Enhancing accessibility to literature and educational
+                    resources for local readers and students"</p>
+                <p class="mb-3">
+                    BookStore Manager began with a simple idea: that everyone deserves access to great books and
+                    affordable educational resources.
+                    Founded in a small garage by a group of avid readers, we struggled with the fragmented nature of
+                    finding textbooks and rare literature in our local area.
+                </p>
+                <p class="mb-3">
+                    Overcoming the challenges of early logistics and limited inventory, we built a centralized platform
+                    designed to serve our community.
+                    We partnered with local schools and publishers to bring costs down and ensure that students never
+                    had to worry about finding their required reading.
+                </p>
+                <p>
+                    Today, we are proud to be a hub for literacy and education, supporting thousands of readers in their
+                    journey of lifelong learning.
+                </p>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- What We Offer -->
+<section class="section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">What We Offer</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="feature-card h-100 p-4 bg-white rounded shadow-sm">
+                    <div class="feature-icon mb-3 text-primary"><i class="bi bi-collection"></i></div>
+                    <h5>Wide Selection</h5>
+                    <p class="text-muted small">Thousands of titles available across fiction, non-fiction, academic, and
+                        more.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card h-100 p-4 bg-white rounded shadow-sm">
+                    <div class="feature-icon mb-3 text-primary"><i class="bi bi-mortarboard"></i></div>
+                    <h5>Student Focus</h5>
+                    <p class="text-muted small">Special discounts on textbooks and curated academic resources for
+                        learners.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card h-100 p-4 bg-white rounded shadow-sm">
+                    <div class="feature-icon mb-3 text-primary"><i class="bi bi-shield-check"></i></div>
+                    <h5>Reliable Service</h5>
+                    <p class="text-muted small">Secure ordering process and timely, trackable delivery to your doorstep.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card h-100 p-4 bg-white rounded shadow-sm">
+                    <div class="feature-icon mb-3 text-primary"><i class="bi bi-people-fill"></i></div>
+                    <h5>Community Events</h5>
+                    <p class="text-muted small">Join our book clubs, author meetups, and reading sessions (Coming
+                        Soon!).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values -->
+<section class="section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Values</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm value-card text-center py-4 bg-primary text-white">
+                    <div class="card-body">
+                        <i class="bi bi-universal-access display-4 mb-3"></i>
+                        <h5 class="card-title fw-bold">Accessibility</h5>
+                        <p class="card-text small opacity-75">Making knowledge reachable for everyone.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm value-card text-center py-4 bg-success text-white">
+                    <div class="card-body">
+                        <i class="bi bi-star display-4 mb-3"></i>
+                        <h5 class="card-title fw-bold">Quality</h5>
+                        <p class="card-text small opacity-75">Curating only the best materials and service.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm value-card text-center py-4 bg-info text-white">
+                    <div class="card-body">
+                        <i class="bi bi-heart display-4 mb-3"></i>
+                        <h5 class="card-title fw-bold">Community</h5>
+                        <p class="card-text small opacity-75">Growing and learning together.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm value-card text-center py-4 bg-warning text-dark">
+                    <div class="card-body">
+                        <i class="bi bi-lightbulb display-4 mb-3"></i>
+                        <h5 class="card-title fw-bold">Innovation</h5>
+                        <p class="card-text small opacity-75">Adopting new ways to serve readers better.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology -->
+<section class="section py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="mb-4">Powered by Modern Technology</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="lead mb-4">
+                    Our platform is built on a robust cloud-based infrastructure, ensuring heavily scalable access even
+                    during peak academic seasons.
+                    We leverage secure and reliable systems to protect your data and guarantee seamless transactions.
+                </p>
+                <div class="d-flex justify-content-center gap-4 text-muted fs-3">
+                    <i class="bi bi-cloud-check" title="Cloud Native"></i>
+                    <i class="bi bi-shield-lock" title="Secure"></i>
+                    <i class="bi bi-speedometer2" title="Fast Performance"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="section py-5">
+    <div class="container">
+        <div class="bg-primary rounded-3 p-5 text-center text-white shadow">
+            <h2 class="fw-bold mb-3 text-white">Ready to Explore?</h2>
+            <p class="mb-4 lead opacity-75">Join our community today and discover a world of knowledge.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('catalog') }}"
+                    class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary">Start Your Reading Journey</a>
+                <a href="{{ url_for('signup') }}" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold">Join
+                    Our Community</a>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
