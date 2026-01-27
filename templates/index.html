@@ -8,7 +8,7 @@
         <p class="hero-subtitle mx-auto lead">Enhancing accessibility to literature and educational resources for our
             local community and students.</p>
         <div class="d-flex gap-3 justify-content-center">
-            <a href="#" class="btn btn-primary btn-lg px-5 rounded-pill">Browse Catalog</a>
+            <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-lg px-5 rounded-pill">Browse Catalog</a>
             {% if not session.get('username') %}
             <a href="{{ url_for('signup') }}" class="btn btn-outline-primary btn-lg px-5 rounded-pill">Sign Up</a>
             {% endif %}
@@ -26,16 +26,35 @@
                 <div class="carousel-item {% if loop.first %}active{% endif %}">
                     <div class="row g-4">
                         {% for book in chunk %}
-                        <div class="col-md-3">
-                            <div class="card book-card h-100">
-                                <img src="{{ book.image }}" class="card-img-top" alt="{{ book.title }}">
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title text-truncate">{{ book.title }}</h5>
+                        <div class="col-6 col-md-4 col-xl-3">
+                            <div class="card book-card h-100 border-0 shadow-sm">
+                                <div class="book-image-container position-relative overflow-hidden"
+                                    style="padding-top: 150%; background: #f8f9fa;">
+                                    <a href="{{ url_for('product_details', isbn13=book.id) }}"
+                                        class="text-decoration-none">
+                                        <img src="{{ book.image }}"
+                                            class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+                                            alt="{{ book.title }}" loading="lazy"
+                                            style="transition: transform 0.5s ease;">
+                                    </a>
+                                    <span class="category-badge position-absolute top-0 end-0 m-2 badge bg-primary">{{
+                                        book.category }}</span>
+                                </div>
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="card-title fw-bold text-truncate-2 mb-1" style="min-height: 2.4em;">
+                                        <a href="{{ url_for('product_details', isbn13=book.id) }}"
+                                            class="text-decoration-none text-dark stretched-link">
+                                            {{ book.title }}
+                                        </a>
+                                    </h6>
                                     <p class="text-muted small mb-2">{{ book.author }}</p>
-                                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold text-primary">${{ book.price }}</span>
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-cart-plus"></i>
-                                            Add</button>
+
+                                    <div
+                                        class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                        <span class="fs-5 fw-bold text-primary">{{ book.price | format_price }}</span>
+                                        <div class="text-warning small" title="{{ book.rating }} stars">
+                                            {{ book.rating | rating_stars | safe }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

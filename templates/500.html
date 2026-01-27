@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Book Spot{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="container text-center py-5">
+        <div class="error-content">
+            <h1 class="error-code">500</h1>
+            <h2 class="error-title">Internal Server Error</h2>
+            <p class="error-message">
+                Something went wrong on our end. We're working to fix it!
+            </p>
+
+            <div class="error-actions mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Go to Homepage
+                </a>
+                <button onclick="window.location.reload()" class="btn btn-outline-primary ms-2">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+
+            <div class="mt-5">
+                <p class="text-muted">If the problem persists, please <a href="{{ url_for('contact') }}">contact us</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-page {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .error-code {
+        font-size: 120px;
+        font-weight: bold;
+        color: #E74C3C;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .error-title {
+        font-size: 36px;
+        margin: 20px 0;
+        color: #2C3E50;
+    }
+
+    .error-message {
+        font-size: 18px;
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}

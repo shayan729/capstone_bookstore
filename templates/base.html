@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="BookStore Manager - Your trusted platform for managing and exploring books.">
-    <title>{% block title %}BookStore Manager{% endblock %}</title>
+    <title>{% block title %}Book Spot{% endblock %}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,18 +29,15 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}" title="Home">
                 <i class="fas fa-book-open me-2 text-primary"></i>
-                <span>BookStore Manager</span>
+                <span>Book Spot</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 fw-medium">
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('index') }}">Home</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('catalog') }}">Catalog</a>
                     </li>
@@ -66,13 +63,16 @@
                     </form>
 
                     <!-- Cart -->
-                    <a href="#" class="position-relative text-dark me-2" title="Cart">
+                    <a href="{{ url_for('cart') }}" class="position-relative text-dark me-2" title="Cart">
                         <i class="bi bi-cart3 fs-5"></i>
+                        {% set cart_count = session.get('cart', [])|length %}
+                        {% if cart_count > 0 %}
                         <span
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white"
                             style="font-size: 0.6rem;">
-                            2
+                            {{ cart_count }}
                         </span>
+                        {% endif %}
                     </a>
 
                     <!-- Auth -->
@@ -83,7 +83,7 @@
                             <i class="bi bi-person-circle me-1"></i> {{ session['username'] }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li><a class="dropdown-item" href="{{ url_for('home') }}"><i
+                            <li><a class="dropdown-item" href="{{ url_for('customer_dashboard') }}"><i
                                         class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -108,7 +108,9 @@
                         </ul>
                     </div>
                     {% else %}
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 align-items-center">
+                        <a href="{{ url_for('admin_login') }}"
+                            class="btn btn-outline-secondary rounded-pill px-3">Admin</a>
                         <a href="{{ url_for('login') }}" class="btn btn-outline-primary rounded-pill px-4">Login</a>
                         <a href="{{ url_for('signup') }}" class="btn btn-primary rounded-pill px-4">Sign Up</a>
                     </div>
@@ -144,7 +146,7 @@
             <div class="row g-4 mb-5">
                 <!-- Brand -->
                 <div class="col-lg-4">
-                    <h5 class="mb-3 font-serif fw-bold text-white">BookStore Manager</h5>
+                    <h5 class="mb-3 font-serif fw-bold text-white">Book Spot- a BookStore Manager</h5>
                     <p class="text-white-50 small mb-4">
                         Enhancing accessibility to literature and educational resources.
                         Join our community of readers and learners today.
@@ -169,6 +171,7 @@
                         <li class="mb-2"><a href="{{ url_for('catalog') }}">Catalog</a></li>
                         <li class="mb-2"><a href="{{ url_for('about') }}">About Us</a></li>
                         <li class="mb-2"><a href="{{ url_for('contact') }}">Contact</a></li>
+                        <li class="mb-2"><a href="{{ url_for('admin_login') }}">Admin Login</a></li>
                         <li class="mb-2"><a href="#">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -207,7 +210,7 @@
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <p class="small text-white-50 mb-0">Designed for Capstone Project</p>
+                    <p class="small text-white-50 mb-0">Designed for Capstone Project by Shayan</p>
                 </div>
             </div>
         </div>

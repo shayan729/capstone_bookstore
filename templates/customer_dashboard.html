@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Book Spot{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">Welcome back, {{ user.full_name or user.username }}!</h1>
+            <p class="text-muted">Manage your orders and preferences here.</p>
+        </div>
+        <div class="d-flex gap-3">
+            <a href="{{ url_for('cart') }}" class="btn btn-outline-primary position-relative">
+                <i class="bi bi-cart3"></i> Cart
+                {% if session.get('cart') %}
+                <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white"
+                    style="font-size: 0.6rem;">
+                    {{ session['cart']|length }}
+                </span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 text-center py-3">
+                <div class="card-body">
+                    <div class="feature-icon mb-2 text-primary"><i class="bi bi-bag-check"></i></div>
+                    <h3 class="mb-0 fw-bold">{{ stats.total_orders }}</h3>
+                    <p class="text-muted small mb-0">Total Orders</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 text-center py-3">
+                <div class="card-body">
+                    <div class="feature-icon mb-2 text-primary"><i class="bi bi-book"></i></div>
+                    <h3 class="mb-0 fw-bold">{{ stats.books_purchased }}</h3>
+                    <p class="text-muted small mb-0">Books Purchased</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 text-center py-3">
+                <div class="card-body">
+                    <div class="feature-icon mb-2 text-primary"><i class="bi bi-currency-rupee"></i></div>
+                    <h3 class="mb-0 fw-bold">{{ stats.amount_spent|format_price }}</h3>
+                    <p class="text-muted small mb-0">Amount Spent</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 text-center py-3">
+                <div class="card-body">
+                    <div class="feature-icon mb-2 text-danger"><i class="bi bi-heart"></i></div>
+                    <h3 class="mb-0 fw-bold">{{ stats.wishlist_items }}</h3>
+                    <p class="text-muted small mb-0">Wishlist Items</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <!-- Main Content (Left Column) -->
+        <div class="col-lg-8">
+
+            <!-- Recent Orders Section -->
+            <section class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Recent Orders</h3>
+                    <a href="#" class="text-decoration-none fw-bold small">View All</a>
+                </div>
+
+                {% if orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle bg-white shadow-sm rounded overflow-hidden">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.date }}</td>
+                                <td>{{ order.items }}</td>
+                                <td>{{ order.total|format_price }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if order.status == 'Delivered' %}bg-success
+                                        {% elif order.status == 'Processing' %}bg-info
+                                        {% elif order.status == 'Cancelled' %}bg-danger
+                                        {% else %}bg-warning{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary" title="View Details"><i
+                                            class="bi bi-eye"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 bg-white rounded shadow-sm">
+                    <div class="display-1 text-muted opacity-25 mb-3"><i class="bi bi-cart-x"></i></div>
+                    <p class="lead text-muted">No orders yet.</p>
+                    <a href="{{ url_for('catalog') }}" class="btn btn-primary mt-2">Start Shopping</a>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Recommended Books Section -->
+            <section class="mb-5">
+                <h3 class="mb-3">Recommended For You</h3>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for book in recommended_books %}
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm book-card list-view">
+                            <div class="book-image-container" style="width: 120px; padding-top: 0;">
+                                <img src="{{ book.image }}" class="card-img-top h-100 w-100 object-fit-cover"
+                                    alt="{{ book.title }}">
+                            </div>
+                            <div class="card-body py-2">
+                                <span class="badge bg-light text-dark mb-1 align-self-start">{{ book.category }}</span>
+                                <h6 class="card-title text-truncate-2 mb-1 fw-bold"><a
+                                        href="{{ url_for('product_details', isbn13=book.isbn) }}"
+                                        class="text-decoration-none text-dark">{{ book.title }}</a></h6>
+                                <p class="small text-muted mb-1">{{ book.author }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="text-primary fw-bold">{{ book.price|format_price }}</span>
+                                    <small class="text-warning"><i class="fas fa-star"></i> {{ book.rating }}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary w-100 mt-2 rounded-pill"
+                                    onclick="addToCart('{{ book.isbn }}')">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Recently Viewed Carousel (Mock) -->
+            <section>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Continue Browsing</h3>
+                    <button class="btn btn-sm btn-link text-muted text-decoration-none">Clear History</button>
+                </div>
+                <!-- Simple placeholder for carousel functionality or just grid for now -->
+                <div class="row row-cols-2 row-cols-md-3 g-3">
+                    <!-- Using recommended logic to fill this for now, but in real app would be session based -->
+                    {% for book in recently_viewed[:3] %}
+                    <div class="col">
+                        <div class="bg-white p-2 rounded shadow-sm text-center">
+                            <img src="{{ book.image }}" class="img-fluid rounded mb-2"
+                                style="height: 120px; object-fit: cover;" alt="{{ book.title }}">
+                            <p class="small fw-bold mb-0 text-truncate">{{ book.title }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Right Sidebar (Right Column) -->
+        <div class="col-lg-4">
+
+            <!-- Account Overview -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold">Account Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="avatar-circle mx-auto mb-3"
+                            style="width: 80px; height: 80px; background: linear-gradient(135deg, #2C3E50, #C75B39); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span class="text-white fw-bold" style="font-size: 32px;">
+                                {% if user and user.full_name %}
+                                {{ user.full_name[0].upper() }}
+                                {% elif session.user_name %}
+                                {{ session.user_name[0].upper() }}
+                                {% else %}
+                                U
+                                {% endif %}
+                            </span>
+                        </div>
+                        <h5 class="fw-bold mb-1">
+                            {% if user and user.full_name %}
+                            {{ user.full_name }}
+                            {% elif session.user_name %}
+                            {{ session.user_name }}
+                            {% else %}
+                            User
+                            {% endif %}
+                        </h5>
+                        <p class="text-muted small mb-0">
+                            {% if user and user.email %}
+                            {{ user.email }}
+                            {% else %}
+                            user@example.com
+                            {% endif %}
+                        </p>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Member Since:</span>
+                        <span class="small fw-semibold">
+                            {% if user and user.created_at %}
+                            {{ user.created_at.strftime('%B %Y') }}
+                            {% else %}
+                            January 2026
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted small">Account Type:</span>
+                        <span class="badge bg-primary">Standard</span>
+                    </div>
+                    <button class="btn btn-outline-primary w-100">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Quick Actions</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{{ url_for('catalog') }}" class="btn btn-light text-start"><i
+                            class="bi bi-search me-2"></i> Browse Catalog</a>
+                    <a href="#" class="btn btn-light text-start"><i class="bi bi-heart me-2"></i> View Wishlist</a>
+                    <a href="#" class="btn btn-light text-start"><i class="bi bi-box-seam me-2"></i> Track Order</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-light text-start"><i
+                            class="bi bi-headset me-2"></i> Contact Support</a>
+                </div>
+            </div>
+
+            <!-- Special Offers -->
+            <div class="card border-0 shadow-sm bg-primary text-white mb-4 position-relative overflow-hidden">
+                <div class="card-body position-relative z-1">
+                    <h5 class="fw-bold mb-2">Special Offer!</h5>
+                    <p class="mb-3 small">Get 20% off your next purchase with code:</p>
+                    <div
+                        class="bg-white bg-opacity-25 p-2 rounded text-center fw-bold font-monospace mb-2 border border-white border-opacity-50">
+                        WELCOME20
+                    </div>
+                    <small class="d-block text-end opacity-75">Valid until Jan 31</small>
+                </div>
+                <!-- Decorative circle -->
+                <div class="position-absolute top-0 end-0 bg-white opacity-10 rounded-circle"
+                    style="width: 100px; height: 100px; margin-right: -20px; margin-top: -20px;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .feature-icon {
+        font-size: 2rem;
+    }
+</style>
+
+<script>
+    function addToCart(isbn13) {
+        fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                isbn13: isbn13,
+                quantity: 1
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ideally show a toast or update cart badge
+                    alert('Added to cart!');
+                    location.reload(); // Simple reload to update cart count
+                } else {
+                    alert('Error adding to cart');
+                }
+            });
+    }
+</script>
+{% endblock %}

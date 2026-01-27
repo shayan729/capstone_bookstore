@@ -1,122 +1,285 @@
 {% extends 'base.html' %}
 
-{% block title %}Catalog - BookStore Manager{% endblock %}
+{% block title %}Catalog - Book Spot{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Catalog</li>
-        </ol>
-    </nav>
+<div class="container py-5 catalog-container">
+    <!-- 1. PAGE HEADER -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Catalog</li>
+                </ol>
+            </nav>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                <div>
+                    <h1 class="display-5 fw-bold mb-1 title-font">Browse Our Collection</h1>
+                    <p class="text-muted lead fs-6 mb-0">Discover from <span id="totalBooksHeader">...</span> books
+                        across multiple categories</p>
+                </div>
+                <!-- Quick stats bar could go here or be purely visual/badges -->
+            </div>
+        </div>
+    </div>
 
-    <div class="row">
-        <!-- Sidebar Filters -->
-        <div class="col-lg-3 mb-4">
-            <div class="filter-sidebar sticky-lg-top" style="top: 2rem; z-index: 1000;">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                        <h5 class="mb-0 fw-bold title-color">Filters</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Search -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small">Search</label>
-                            <input type="text" id="searchInput" class="form-control" placeholder="Title or Author...">
-                        </div>
+    <!-- 2. MAIN LAYOUT -->
+    <div class="row g-4">
 
-                        <!-- Category -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small">Category</label>
-                            <select id="categorySelect" class="form-select">
-                                <option value="All">All Categories</option>
-                                <option value="Fiction">Fiction</option>
-                                <option value="Non-Fiction">Non-Fiction</option>
-                                <option value="Academic">Academic</option>
-                                <option value="Children's">Children's</option>
-                                <option value="Science Fiction">Science Fiction</option>
-                                <option value="Fantasy">Fantasy</option>
-                                <option value="Romance">Romance</option>
-                                <option value="Science">Science</option>
-                                <option value="Memoir">Memoir</option>
-                            </select>
-                        </div>
+        <!-- LEFT SIDEBAR (Sticky) -->
+        <div class="col-lg-3">
+            <!-- Mobile Toggle Button (Visible only on mobile) -->
+            <button class="btn btn-primary d-lg-none mb-3 w-100" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#filterSidebar" aria-controls="filterSidebar">
+                <i class="fas fa-filter me-2"></i> Show Filters
+            </button>
 
-                        <!-- Price Range -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small d-flex justify-content-between">
-                                Price Range
-                                <span id="priceValue" class="text-primary">Up to ₹2000</span>
-                            </label>
-                            <input type="range" class="form-range" id="priceRange" min="0" max="2000" step="50"
-                                value="2000">
-                        </div>
+            <div class="filter-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="filterSidebar"
+                aria-labelledby="filterSidebarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title fw-bold" id="filterSidebarLabel">Filters</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterSidebar"
+                        aria-label="Close"></button>
+                </div>
 
-                        <!-- Author -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small">Author</label>
-                            <input type="text" id="authorInput" class="form-control" placeholder="Filter by Author...">
-                        </div>
-
-                        <!-- Availability -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="stockCheck">
-                                <label class="form-check-label small" for="stockCheck">
-                                    In Stock Only
-                                </label>
+                <div class="offcanvas-body d-flex flex-column p-0">
+                    <div class="sticky-lg-top" style="top: 20px; z-index: 900;">
+                        <!-- A. SEARCH BAR -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-3">
+                                <div class="position-relative">
+                                    <i
+                                        class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                    <input type="text" id="searchInput" class="form-control ps-5 rounded-pill"
+                                        placeholder="Search by title..." aria-label="Search">
+                                    <button id="clearSearchBtn"
+                                        class="btn btn-sm btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 d-none text-decoration-none">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Actions -->
-                        <div class="d-grid gap-2">
-                            <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
-                            <button id="clearFilters" class="btn btn-outline-secondary btn-sm">Clear All</button>
+                        <!-- B. FILTERS SECTION -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-3">
+                                <!-- CATEGORY FILTER -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3 text-uppercase small text-muted ls-1">Category</h6>
+                                    <select id="categorySelect" class="form-select form-select-sm"
+                                        aria-label="Category Filter">
+                                        <option value="All" selected>All Categories</option>
+                                        {% for cat in categories %}
+                                        <option value="{{ cat }}">{{ cat }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <hr class="text-muted opacity-25">
+
+                                <!-- PRICE RANGE FILTER -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3 text-uppercase small text-muted ls-1">Price Range</h6>
+                                    <div id="priceSlider" class="mb-3 px-2"></div>
+                                    <div class="d-flex justify-content-between small fw-bold text-primary">
+                                        <span id="priceMinDisplay">₹0</span>
+                                        <span id="priceMaxDisplay">₹2000+</span>
+                                    </div>
+                                    <input type="hidden" id="priceMaxInput" value="2000">
+                                </div>
+
+                                <hr class="text-muted opacity-25">
+
+                                <!-- AUTHOR FILTER -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3 text-uppercase small text-muted ls-1">Author</h6>
+                                    <input type="text" id="authorInput" class="form-control form-control-sm"
+                                        placeholder="Filter by name...">
+                                </div>
+
+                                <hr class="text-muted opacity-25">
+
+                                <!-- AVAILABILITY FILTER -->
+                                <div class="mb-4">
+                                    <div class="form-check form-switch cursor-pointer">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="stockCheck">
+                                        <label class="form-check-label fw-medium small" for="stockCheck">In Stock
+                                            Only</label>
+                                    </div>
+                                </div>
+
+                                <!-- C. FILTER ACTIONS -->
+                                <div class="d-grid gap-2">
+                                    <button id="applyFiltersBtn"
+                                        class="btn btn-primary btn-sm rounded-pill fw-bold">Apply Filters</button>
+                                    <button id="clearFiltersBtn"
+                                        class="btn btn-outline-secondary btn-sm rounded-pill">Clear All</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- D. FEATURED BANNER (Mini) -->
+                        <div class="mt-4 d-none d-lg-block">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h6 class="fw-bold fs-7 mb-3">Top Rated</h6>
+                                    <div id="sidebarFeatured" class="d-flex flex-column gap-3">
+                                        <!-- Populated via JS -->
+                                        <div class="text-center py-2">
+                                            <div class="spinner-border spinner-border-sm text-muted"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- RIGHT MAIN CONTENT -->
         <div class="col-lg-9">
-            <!-- Results Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span id="resultsCount" class="text-muted">Showing 0 books</span>
-                <div class="d-flex align-items-center gap-2">
-                    <label class="small text-muted text-nowrap">Sort by:</label>
-                    <select id="sortSelect" class="form-select form-select-sm" style="width: auto;">
-                        <option value="newest">Newest</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                        <option value="az">A-Z</option>
-                    </select>
+
+            <!-- A. CONTROLS BAR -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div
+                    class="card-body p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <span id="resultsCount" class="fw-medium text-muted small">Showing ...</span>
+                        <!-- Active Filters Tags could exist here dynamically -->
+                    </div>
+
+                    <div
+                        class="d-flex align-items-center gap-2 w-100 w-sm-auto justify-content-between justify-content-sm-end">
+                        <div class="d-flex gap-1 bg-light rounded p-1 me-2">
+                            <button class="btn btn-sm btn-white shadow-sm active-view" id="gridViewBtn"
+                                title="Grid View"><i class="fas fa-th-large"></i></button>
+                            <button class="btn btn-sm text-muted" id="listViewBtn" title="List View"><i
+                                    class="fas fa-list"></i></button>
+                        </div>
+
+                        <div class="input-group input-group-sm" style="max-width: 200px;">
+                            <label class="input-group-text bg-light border-0 text-muted" for="sortSelect">Sort</label>
+                            <select class="form-select border-0 bg-light fw-medium" id="sortSelect">
+                                <option value="relevance">Relevance</option>
+                                <option value="rating" selected>Highest Rated</option>
+                                <option value="popular">Most Popular</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                                <option value="newest">Newest First</option>
+                                <option value="az">Title: A-Z</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Loader -->
-            <div id="loader" class="text-center py-5 d-none">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <!-- Active Filter Tags Display Area -->
+            <div id="activeFilters" class="mb-3 d-flex flex-wrap gap-2"></div>
+
+            <!-- D. LOADING STATE -->
+            <div id="loader" class="row g-4 d-none">
+                {% for i in range(8) %}
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="card border-0 shadow-sm h-100" aria-hidden="true">
+                        <div class="bg-light w-100" style="height: 250px;"></div>
+                        <div class="card-body p-3">
+                            <h5 class="card-title placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h5>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
 
-            <!-- Book Grid -->
-            <div id="bookGrid" class="row g-4">
-                <!-- Books will be injected here via JS -->
+            <!-- B & C. BOOKS GRID/LIST VIEW -->
+            <div id="bookContainer" class="row g-4 opacity-100 transition-opacity">
+                <!-- Books injected here -->
             </div>
 
-            <!-- Pagination -->
-            <nav class="mt-5 d-flex justify-content-center">
-                <ul id="pagination" class="pagination">
-                    <!-- Pagination links injected via JS -->
+            <!-- E. EMPTY STATE -->
+            <div id="emptyState" class="text-center py-5 d-none">
+                <i class="fas fa-books text-muted opacity-25 display-1 mb-3"></i>
+                <h3 class="fw-bold text-muted">No books found</h3>
+                <p class="text-muted">Try adjusting your filters or search terms</p>
+                <button class="btn btn-outline-primary mt-2" id="emptyClearBtn">Clear All Filters</button>
+            </div>
+
+            <!-- F. PAGINATION -->
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul id="pagination" class="pagination justify-content-center">
+                    <!-- Pagination injected here -->
                 </ul>
             </nav>
+
         </div>
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='catalog.js') }}"></script>
+<!-- Quick View Modal Placeholder -->
+<!-- Add modal HTML here if implemented -->
+
+<!-- Dependencies -->
+<!-- noUiSlider -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+<style>
+    /* Inline overrides for noUiSlider to match theme */
+    .noUi-connect {
+        background: #C75B39;
+    }
+
+    .noUi-handle {
+        border: 2px solid #C75B39;
+        background: #fff;
+        box-shadow: none;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .noUi-handle:before,
+    .noUi-handle:after {
+        display: none;
+    }
+
+    .noUi-target {
+        border: none;
+        background: #E0E0E0;
+        box-shadow: none;
+        height: 6px;
+    }
+
+    /* Transition utils */
+    .transition-opacity {
+        transition: opacity 0.3s ease;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .fs-7 {
+        font-size: 0.9rem;
+    }
+
+    /* Active view button */
+    .btn-white {
+        background-color: white;
+        color: var(--primary-color);
+    }
+
+    .btn-white.active-view {
+        color: var(--accent-color);
+        font-weight: bold;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+<script src="{{ url_for('static', filename='js/catalog.js') }}"></script>
 {% endblock %}

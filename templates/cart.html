@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Book Spot{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <nav aria-label="breadcrumb" class="me-auto">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Cart</li>
+            </ol>
+        </nav>
+        {% if cart_items %}
+        <span class="text-muted">You have {{ cart_items|length }} items in your cart</span>
+        {% endif %}
+    </div>
+
+    <h2 class="mb-4 title-font fw-bold">Shopping Cart</h2>
+
+    {% if not cart_items %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white rounded shadow-sm">
+        <div class="display-1 text-muted opacity-25 mb-3"><i class="bi bi-cart-x"></i></div>
+        <h3 class="fw-bold text-muted mb-3">Your cart is empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+        <a href="{{ url_for('catalog') }}" class="btn btn-primary px-4 py-2">Start Shopping</a>
+    </div>
+    {% else %}
+
+    <div class="row g-4">
+        <!-- Cart Items (Left Column) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 py-3" style="width: 40%">Product</th>
+                                    <th class="py-3" style="width: 20%">Quantity</th>
+                                    <th class="text-end py-3" style="width: 20%">Price</th>
+                                    <th class="text-center py-3" style="width: 20%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr id="row-{{ item.isbn13 }}" class="border-bottom">
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.image }}" alt="{{ item.title }}" class="rounded me-3"
+                                                style="width: 60px; height: 90px; object-fit: cover;">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold"><a
+                                                        href="{{ url_for('product_details', isbn13=item.isbn13) }}"
+                                                        class="text-decoration-none text-dark">{{ item.title }}</a></h6>
+                                                <p class="text-muted small mb-0">{{ item.isbn13 }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                onclick="updateQty('{{ item.isbn13 }}', -1)">-</button>
+                                            <input type="text" class="form-control text-center bg-white"
+                                                value="{{ item.quantity }}" readonly id="qty-{{ item.isbn13 }}">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                onclick="updateQty('{{ item.isbn13 }}', 1)">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="text-end py-3">
+                                        <div class="fw-bold text-primary">{{ (item.price * item.quantity)|format_price
+                                            }}</div>
+                                        <div class="small text-muted">{{ item.price|format_price }} / item</div>
+                                    </td>
+                                    <td class="text-center py-3">
+                                        <button class="btn btn-sm btn-link text-danger"
+                                            onclick="removeItem('{{ item.isbn13 }}')" title="Remove">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('catalog') }}" class="text-decoration-none"><i
+                            class="bi bi-arrow-left me-2"></i>Continue Shopping</a>
+                    <button class="btn btn-outline-danger btn-sm" onclick="clearCart()">Clear Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary (Right Column) -->
+        <div class="col-lg-4">
+            <!-- Price Breakdown -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-bold">{{ totals.subtotal|format_price }}</span>
+                    </div>
+                    {% if totals.discount > 0 %}
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Discount {% if coupon %}({{ coupon.code }}){% endif %}</span>
+                        <span>-{{ totals.discount|format_price }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Shipping</span>
+                        <span>{{ "Free" if totals.shipping == 0 else totals.shipping|format_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Tax (18% GST)</span>
+                        <span>{{ totals.tax|format_price }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="fw-bold">Total</h5>
+                        <h5 class="fw-bold text-primary">{{ totals.total|format_price }}</h5>
+                    </div>
+
+                    <!-- Coupon Code -->
+                    {% if not coupon %}
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Promo code" id="couponCode">
+                        <button class="btn btn-outline-secondary" type="button" onclick="applyCoupon()">Apply</button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success d-flex justify-content-between align-items-center py-2 px-3 mb-3">
+                        <small class="mb-0"><i class="bi bi-tag-fill me-1"></i> {{ coupon.code }} applied</small>
+                        <button class="btn btn-link btn-sm p-0 text-success" onclick="removeCoupon()">✕</button>
+                    </div>
+                    {% endif %}
+
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">Proceed to
+                        Checkout</a>
+                    <a href="#" class="btn btn-outline-secondary w-100 mt-2">Save for Later</a>
+                </div>
+            </div>
+
+            <!-- Benefits -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-truck fs-4 text-primary me-3"></i>
+                        <span class="small text-muted">Free shipping on orders over ₹500</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-shield-check fs-4 text-primary me-3"></i>
+                        <span class="small text-muted">100% secure payment processing</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-arrow-counterclockwise fs-4 text-primary me-3"></i>
+                        <span class="small text-muted">Easy 7-day return policy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Update Quantity
+    function updateQty(isbn13, change) {
+        const input = document.getElementById(`qty-${isbn13}`);
+        let newQty = parseInt(input.value) + change;
+        if (newQty < 1) return;
+
+        fetch('/api/cart/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isbn13: isbn13, quantity: newQty })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+
+    // Remove Item
+    function removeItem(isbn13) {
+        if (!confirm('Remove this item from cart?')) return;
+
+        const row = document.getElementById(`row-${isbn13}`);
+        row.style.opacity = '0.5';
+
+        fetch('/api/cart/remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isbn13: isbn13 })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+
+    // Clear Cart
+    function clearCart() {
+        if (!confirm('Are you sure you want to clear your cart?')) return;
+
+        fetch('/api/cart/clear', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+    }
+
+    // Apply Coupon
+    function applyCoupon() {
+        const code = document.getElementById('couponCode').value;
+        if (!code) return;
+
+        fetch('/api/cart/apply-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+    }
+</script>
+{% endblock %}

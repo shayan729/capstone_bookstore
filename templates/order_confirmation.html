@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - Book Spot{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Message -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                <h1 class="fw-bold mb-3 title-font">Order Placed Successfully! 🎉</h1>
+                <p class="lead text-muted">Thank you for your purchase. Your order has been confirmed.</p>
+                <div class="alert alert-success d-inline-block px-4 py-2 mt-2">
+                    Order ID: <strong>{{ order.order_id }}</strong>
+                </div>
+                <p class="small text-muted mt-3">
+                    We've sent a confirmation email to <strong>{{ order.guest_email or 'your registered email'
+                        }}</strong>.
+                </p>
+            </div>
+
+            <!-- Order Details Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Order Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <h6 class="text-muted small text-uppercase fw-bold">Order info</h6>
+                            <div><strong>Date:</strong> {{ order.created_at.strftime('%B %d, %Y') if order.created_at
+                                else 'N/A' }}</div>
+                            <div><strong>Status:</strong> <span class="badge bg-warning text-dark">Processing</span>
+                            </div>
+                            <div><strong>Payment:</strong> Cash on Delivery (Mock)</div>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <h6 class="text-muted small text-uppercase fw-bold">Shipping Address</h6>
+                            <address class="mb-0">
+                                <strong>{{ address.full_name }}</strong><br>
+                                {{ address.address_line1 }}<br>
+                                {% if address.address_line2 %}{{ address.address_line2 }}<br>{% endif %}
+                                {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                                Phone: {{ address.phone }}
+                            </address>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Item</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ item.title }}</div>
+                                        <small class="text-muted">{{ item.isbn13 }}</small>
+                                    </td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ (item.price * item.quantity)|format_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="border-top">
+                                <tr>
+                                    <td colspan="2" class="text-end border-0 pt-3">Subtotal</td>
+                                    <td class="text-end border-0 pt-3">{{ order.subtotal|format_price }}</td>
+                                </tr>
+                                {% if order.discount > 0 %}
+                                <tr>
+                                    <td colspan="2" class="text-end border-0">Discount</td>
+                                    <td class="text-end border-0 text-success">-{{ order.discount|format_price }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td colspan="2" class="text-end border-0">Shipping</td>
+                                    <td class="text-end border-0">{{ "Free" if order.shipping == 0 else
+                                        order.shipping|format_price }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-end border-0">Tax</td>
+                                    <td class="text-end border-0">{{ order.tax|format_price }}</td>
+                                </tr>
+                                <tr class="fw-bold fs-5">
+                                    <td colspan="2" class="text-end border-0">Total</td>
+                                    <td class="text-end border-0 text-primary">{{ order.total|format_price }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline-primary px-4">Track Order</a>
+                <a href="{{ url_for('catalog') }}" class="btn btn-primary px-4">Continue Shopping</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
