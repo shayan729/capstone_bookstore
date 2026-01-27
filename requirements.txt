@@ -7,4 +7,5 @@ werkzeug
 datetime
 re
 sqlite3
-
+python-dotenv
+Pillow

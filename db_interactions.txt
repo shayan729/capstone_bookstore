@@ -1,0 +1,75 @@
+DATABASE INTERACTIONS REPORT
+============================
+
+This report lists files in the project that interact with databases (SQLite and DynamoDB) and describes their specific read/write operations.
+
+1. APP.PY (Main Application - SQLite)
+-------------------------------------
+Technology: SQLite (via utils.db_helper)
+Interactions:
+
+  [READ OPERATIONS]
+  - / (Index):
+    - Reads 'books' table for featured books, recent books, and count statistics.
+  - /api/books:
+    - Reads 'books' table with complex filtering (search, category, price, author, stock).
+  - /book/<isbn13>:
+    - Reads 'books' table for details and related items.
+  - /search:
+    - Reads 'books' table for query matching.
+  - /login & /admin/login:
+    - Reads 'users' and 'admins' tables to verify credentials.
+  - /dashboard & /admin/dashboard:
+    - Reads 'users', 'books' (stats, low stock), and 'orders' (mocked in some routes, read in checkout).
+  - /signup:
+    - Reads 'users' table to check for existing username/email.
+  - /checkout:
+    - Reads 'books' table to verify stock availability.
+    - Reads 'users' table for customer details.
+
+  [WRITE OPERATIONS]
+  - /signup:
+    - Inserts into 'users' table (new customer registration).
+  - /admin/signup:
+    - Inserts into 'admins' table (new admin registration).
+  - /login & /admin/login:
+    - Updates 'users'/'admins' table (sets 'last_login' timestamp).
+  - /checkout/place-order:
+    - Inserts into 'orders' table (new order record).
+    - Inserts into 'order_items' table (items linked to order).
+    - Inserts into 'delivery_addresses' table.
+    - Updates 'books' table (decrements remaining stock).
+  - /admin/books/add:
+    - Inserts into 'books' table (new book definition).
+  - /admin/books/delete/<isbn13>:
+    - Deletes from 'books' table.
+
+
+
+3. MAINTENANCE & SETUP SCRIPTS (SQLite)
+---------------------------------------
+
+  A. INIT_DB.PY
+     - Write: Executes 'schema.sql' to create tables.
+     - Write: Inserts initial seed data into 'books' table.
+
+  B. IMPORT_DATA.PY
+     - Write: Reads CSV and bulk inserts/replaces data in 'books' table.
+
+  C. UPDATE_ADMIN_SCHEMA.PY
+     - Write: Drops and recreates 'admins' table.
+     - Write: Inserts default admin user.
+
+  D. UPDATE_CHECKOUT_SCHEMA.PY
+     - Write: Creates 'orders', 'order_items', 'delivery_addresses' tables if missing.
+
+  E. CHECK-SCHEMA.PY
+     - Read: Checks 'PRAGMA table_info' for 'admins', 'users', 'books' to verify structure.
+
+  F. VERIFY_DB.PY
+     - Read: Queries 'books' table to show sample data and structure.
+
+4. UTILITIES
+------------
+  - utils/db_helper.py:
+    - Manages SQLite connection logic (get_db, close_db).

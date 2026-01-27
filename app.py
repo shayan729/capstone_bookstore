@@ -1,12 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-
 import os
 import math
 import sqlite3
-from werkzeug.utils import secure_filename
-from config import Config
-import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from werkzeug.utils import secure_filename
 from config import Config
 from utils.db_helper import get_db, close_db
@@ -19,17 +14,14 @@ import re
 app = Flask(__name__)
 app.config.from_object(Config)
 
-
 # Register database teardown
 app.teardown_appcontext(close_db)
-
 
 # Ensure instance folder exists
 try:
     os.makedirs(app.instance_path)
 except OSError:
     pass
-
 
 # User storage is now handled via database
 
@@ -64,7 +56,6 @@ def map_book_row(row):
     book['reviews'] = []  # Placeholder for future review feature
     
     return book
-
 
 # ==================== PUBLIC ROUTES ====================
 
@@ -595,9 +586,6 @@ def admin_dashboard():
         recent_orders=orders
     )
 
-
-
-
 # Config for Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -985,8 +973,6 @@ def apply_coupon():
 
 # ==================== ADMIN ROUTES ====================
 
-
-
 @app.route('/admin/books')
 def admin_books():
     """Admin books management page."""
@@ -1106,8 +1092,6 @@ def admin_orders():
     return render_template('admin_orders.html', orders=orders)
 
 
-
-
 # ==================== TEMPLATE FILTERS ====================
 
 @app.template_filter('format_price')
@@ -1171,7 +1155,6 @@ def not_found(error):
 def internal_error(error):
     """500 error handler."""
     return render_template('500.html'), 500
-
 
 # ==================== RUN APPLICATION ====================
 
