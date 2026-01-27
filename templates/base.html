@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="BookStore Manager - Your trusted platform for managing and exploring books.">
+    <meta name="keywords" content="BookStore, Book Manager, Book Catalog, Book Store, Book Catalog">
+    <meta name="author" content="Shayan">
+    <link rel="book" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta property="og:title" content="BookStore Manager">
+    <meta property="og:description"
+        content="BookStore Manager - Your trusted platform for managing and exploring books.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bookstore-manager.com">
+    <meta property="og:image" content="https://bookstore-manager.com/images/book-placeholder.jpg">
     <title>{% block title %}Book Spot{% endblock %}</title>
 
     <!-- Google Fonts -->
@@ -210,7 +219,7 @@
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <p class="small text-white-50 mb-0">Designed for Capstone Project by Shayan</p>
+                    <p class="small text-white-50 mb-0">Designed for Capstone Project by Shayan.</p>
                 </div>
             </div>
         </div>

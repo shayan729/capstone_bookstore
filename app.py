@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+
 import os
 import math
 import sqlite3
@@ -989,7 +990,7 @@ def apply_coupon():
 @app.route('/admin/books')
 def admin_books():
     """Admin books management page."""
-    if 'admin' not in session:
+    if 'admin_id' not in session:
         return redirect(url_for('admin_login'))
     
     db = get_db()
@@ -999,11 +1000,88 @@ def admin_books():
     per_page = 20
     offset = (page - 1) * per_page
     
-    rows = db.execute(
-        'SELECT * FROM books ORDER BY title ASC LIMIT ? OFFSET ?',
-        (per_page, offset)
-    ).fetchall()
+    # Optional Search
+    search_query = request.args.get('q', '').strip()
+    if search_query:
+        query = 'SELECT * FROM books WHERE LOWER(title) LIKE ? OR isbn13 LIKE ? ORDER BY title ASC LIMIT ? OFFSET ?'
+        search_param = f'%{search_query.lower()}%'
+        rows = db.execute(query, (search_param, search_param, per_page, offset)).fetchall()
+        
+        count_query = 'SELECT COUNT(*) as count FROM books WHERE LOWER(title) LIKE ? OR isbn13 LIKE ?'
+        total_books = db.execute(count_query, (search_param, search_param)).fetchone()['count']
+    else:
+        rows = db.execute(
+            'SELECT * FROM books ORDER BY title ASC LIMIT ? OFFSET ?',
+            (per_page, offset)
+        ).fetchall()
+        total_books = db.execute('SELECT COUNT(*) as count FROM books').fetchone()['count']
+
     books = [map_book_row(r) for r in rows]
+    total_pages = math.ceil(total_books / per_page)
+    
+    return render_template('admin_books.html', books=books, page=page, total_pages=total_pages, search_query=search_query)
+
+
+@app.route('/admin/books/add', methods=['GET', 'POST'])
+def add_book():
+    """Add a new book to the catalog."""
+    if 'admin_id' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        # Extract fields
+        title = request.form.get('title', '').strip()
+        authors = request.form.get('authors', '').strip()
+        isbn13 = request.form.get('isbn13', '').strip()
+        price = request.form.get('price', '').strip()
+        stock = request.form.get('stock', '').strip()
+        category = request.form.get('category', '').strip()
+        description = request.form.get('description', '').strip()
+        image = request.form.get('image', '').strip()
+        
+        # Validation
+        if not all([title, authors, isbn13, price, stock]):
+            flash('Please fill in all required fields.', 'danger')
+            return redirect(url_for('add_book'))
+            
+        try:
+            db = get_db()
+            db.execute('''
+                INSERT INTO books (
+                    isbn13, title, authors, price, stock, categories, description, thumbnail, 
+                    average_rating, ratings_count, published_year, num_pages
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                isbn13, title, authors, float(price), int(stock), category, description, 
+                image or '/static/images/book-placeholder.jpg', 0, 0, datetime.now().year, 0
+            ))
+            db.commit()
+            flash('Book added successfully!', 'success')
+            return redirect(url_for('admin_books'))
+            
+        except sqlite3.IntegrityError:
+            flash(f'Book with ISBN {isbn13} already exists.', 'danger')
+        except Exception as e:
+            flash(f'Error adding book: {str(e)}', 'danger')
+            
+    # Get categories for dropdown
+    categories = get_display_categories()
+    return render_template('admin_add_book.html', categories=categories)
+
+
+@app.route('/admin/books/delete/<isbn13>', methods=['POST'])
+def delete_book(isbn13):
+    """Delete a book from the catalog."""
+    if 'admin_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        db = get_db()
+        db.execute('DELETE FROM books WHERE isbn13 = ?', (isbn13,))
+        db.commit()
+        return jsonify({'success': True, 'message': 'Book deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
     
     total_books = db.execute('SELECT COUNT(*) as count FROM books').fetchone()['count']
     total_pages = math.ceil(total_books / per_page)
