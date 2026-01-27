@@ -1,0 +1,3 @@
+username,email,password_hash,full_name,role,created_at,last_login
+shayan,abcd@gmail.com,scrypt:32768:8:1$mhLImNp1hItJuIhT$782f7829e9434a011aa124df74f6a36873524c16679b74762a3566c6ea58eec65d595c2fd5790f6b8c0c59c1988b720e87f09a4a116e640ac146cfc82eb2f2ff,Shayan,customer,2026-01-27 10:04:36,2026-01-27 22:31:27.192624
+shayan1,abcd@123.com,scrypt:32768:8:1$WehN3w1mLT1mff0n$8fe17120106326c44d968771cd1baf16dfab235a3e9b133c1b12264fb25975a52edf46e8f30069a7e805566c0b8fa9bece75e923835d100285327afac3347ebe,shayan1,customer,2026-01-27 12:24:29,

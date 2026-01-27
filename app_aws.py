@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # DynamoDB Configuration
-AWS_REGION = os.getenv('AWS_DEFAULT_REGION', 'ap-south-1')
+AWS_REGION = os.getenv('AWS_DEFAULT_REGION', 'us-east-1')
 dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 
 # Table references

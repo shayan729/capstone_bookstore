@@ -1,0 +1,267 @@
+{
+    "Books": {
+        "TableName": "Books",
+        "KeySchema": [
+            {
+                "AttributeName": "isbn13",
+                "KeyType": "HASH"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "isbn13",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "categories",
+                "AttributeType": "S"
+            }
+        ],
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexName": "CategoriesIndex",
+                "KeySchema": [
+                    {
+                        "AttributeName": "categories",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "isbn13",
+            "isbn10",
+            "title",
+            "subtitle",
+            "authors",
+            "categories",
+            "thumbnail",
+            "description",
+            "published_year",
+            "average_rating",
+            "num_pages",
+            "ratings_count",
+            "price",
+            "stock"
+        ]
+    },
+    "Users": {
+        "TableName": "Users",
+        "KeySchema": [
+            {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "id",
+                "AttributeType": "N"
+            },
+            {
+                "AttributeName": "email",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "username",
+                "AttributeType": "S"
+            }
+        ],
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexName": "EmailIndex",
+                "KeySchema": [
+                    {
+                        "AttributeName": "email",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            },
+            {
+                "IndexName": "UsernameIndex",
+                "KeySchema": [
+                    {
+                        "AttributeName": "username",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "id",
+            "username",
+            "email",
+            "password_hash",
+            "full_name",
+            "role",
+            "created_at",
+            "last_login"
+        ]
+    },
+    "Admins": {
+        "TableName": "Admins",
+        "KeySchema": [
+            {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "id",
+                "AttributeType": "N"
+            },
+            {
+                "AttributeName": "username",
+                "AttributeType": "S"
+            }
+        ],
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexName": "UsernameIndex",
+                "KeySchema": [
+                    {
+                        "AttributeName": "username",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "id",
+            "username",
+            "email",
+            "password_hash",
+            "full_name",
+            "created_at",
+            "last_login"
+        ]
+    },
+    "Orders": {
+        "TableName": "Orders",
+        "KeySchema": [
+            {
+                "AttributeName": "order_id",
+                "KeyType": "HASH"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "order_id",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "user_id",
+                "AttributeType": "N"
+            }
+        ],
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexName": "UserOrdersIndex",
+                "KeySchema": [
+                    {
+                        "AttributeName": "user_id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "id",
+            "order_id",
+            "user_id",
+            "guest_email",
+            "guest_name",
+            "guest_phone",
+            "subtotal",
+            "discount",
+            "shipping",
+            "tax",
+            "total",
+            "coupon_code",
+            "status",
+            "created_at"
+        ]
+    },
+    "OrderItems": {
+        "TableName": "OrderItems",
+        "KeySchema": [
+            {
+                "AttributeName": "order_id",
+                "KeyType": "HASH"
+            },
+            {
+                "AttributeName": "isbn13",
+                "KeyType": "RANGE"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "order_id",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "isbn13",
+                "AttributeType": "S"
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "id",
+            "order_id",
+            "isbn13",
+            "title",
+            "author",
+            "price",
+            "quantity",
+            "subtotal"
+        ]
+    },
+    "DeliveryAddresses": {
+        "TableName": "DeliveryAddresses",
+        "KeySchema": [
+            {
+                "AttributeName": "order_id",
+                "KeyType": "HASH"
+            }
+        ],
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "order_id",
+                "AttributeType": "S"
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "Headers": [
+            "id",
+            "order_id",
+            "full_name",
+            "phone",
+            "address_line1",
+            "address_line2",
+            "city",
+            "state",
+            "pincode",
+            "landmark"
+        ]
+    }
+}
