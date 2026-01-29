@@ -503,19 +503,52 @@ def customer_dashboard():
     db = get_db()
     user = db.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
     
-    # Mock Orders (until implemented)
-    orders = [
-        {'id': '1001', 'date': '2026-01-20', 'items': 2, 'total': 450.00, 'status': 'Delivered'},
-        {'id': '1005', 'date': '2026-01-25', 'items': 1, 'total': 299.00, 'status': 'Processing'}
-    ]
-    
-    # User Stats (Mock)
+    # Real Orders Data
+    orders = []
     stats = {
-        'total_orders': 2, # Mock based on above
-        'books_purchased': 3,
-        'amount_spent': 749.00,
-        'wishlist_items': 5
+        'total_orders': 0,
+        'books_purchased': 0,
+        'amount_spent': 0,
+        'wishlist_items': 0 # Mock for now
     }
+    
+    try:
+        # Fetch user orders
+        orders_rows = db.execute(
+            'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', 
+            (session['user_id'],)
+        ).fetchall()
+        
+        # Calculate stats
+        stats['total_orders'] = len(orders_rows)
+        stats['amount_spent'] = sum(float(o['total']) for o in orders_rows)
+        
+        total_items = 0
+        final_orders = []
+        
+        for row in orders_rows:
+            # Count items in this order
+            item_count_row = db.execute(
+                'SELECT SUM(quantity) as count FROM order_items WHERE order_id = ?',
+                (row['order_id'],)
+            ).fetchone()
+            item_count = item_count_row['count'] if item_count_row and item_count_row['count'] else 0
+            total_items += item_count
+            
+            final_orders.append({
+                'id': row['order_id'],
+                'date': row['created_at'][:10],
+                'items': item_count,
+                'total': float(row['total']),
+                'status': row['status']
+            })
+            
+        stats['books_purchased'] = total_items
+        orders = final_orders
+        
+    except Exception as e:
+        print(f"Error fetching dashboard data: {e}")
+        # Fallback empty or mock if critical
     
     # Fetch Recommended Books (Random selection from same categories or popular)
     # For now, just 4 random books
@@ -560,22 +593,47 @@ def admin_dashboard():
     ).fetchall()
     low_stock_books = [map_book_row(r) for r in low_stock]
 
-    # Mock Orders (until implemented)
-    orders = [
-        {'id': '1024', 'customer': 'John Doe', 'date': '2026-01-27', 'items': 3, 'amount': 45.99, 'status': 'Pending'},
-        {'id': '1023', 'customer': 'Jane Smith', 'date': '2026-01-26', 'items': 1, 'amount': 12.50, 'status': 'Processing'},
-        {'id': '1022', 'customer': 'Bob Johnson', 'date': '2026-01-26', 'items': 2, 'amount': 28.00, 'status': 'Shipped'},
-        {'id': '1021', 'customer': 'Alice Brown', 'date': '2026-01-25', 'items': 5, 'amount': 112.75, 'status': 'Delivered'},
-        {'id': '1020', 'customer': 'Charlie Wilson', 'date': '2026-01-24', 'items': 1, 'amount': 15.00, 'status': 'Cancelled'}
-    ]
+    # Mock Orders (Fallback)
+    orders = []
 
     stats = {
         'total_books': total_books,
         'total_users': total_users,
         'total_admins': total_admins,
-        'total_orders': 154,  # Mock total
-        'total_revenue': 4520.50 # Mock revenue
+        'total_orders': 0,
+        'total_revenue': 0.0
     }
+    
+    try:
+        # Real Revenue & Orders Count
+        rev_row = db.execute('SELECT COUNT(*) as count, SUM(total) as revenue FROM orders').fetchone()
+        stats['total_orders'] = rev_row['count']
+        stats['total_revenue'] = float(rev_row['revenue']) if rev_row['revenue'] else 0.0
+        
+        # Recent Orders
+        recent_orders_rows = db.execute(
+            'SELECT * FROM orders ORDER BY created_at DESC LIMIT 10'
+        ).fetchall()
+        
+        for row in recent_orders_rows:
+             # Count items
+            item_count_row = db.execute(
+                'SELECT SUM(quantity) as count FROM order_items WHERE order_id = ?',
+                (row['order_id'],)
+            ).fetchone()
+            item_count = item_count_row['count'] if item_count_row and item_count_row['count'] else 0
+            
+            orders.append({
+                'id': row['order_id'],
+                'customer': row['guest_name'], # Or fetch username if registered
+                'date': row['created_at'][:10],
+                'items': item_count,
+                'amount': float(row['total']),
+                'status': row['status']
+            })
+            
+    except Exception as e:
+        print(f"Error fetching admin dashboard data: {e}")
     
     return render_template(
         'admin_dashboard.html',
