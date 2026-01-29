@@ -21,6 +21,7 @@ app.config.from_object(Config)
 # DynamoDB Configuration
 AWS_REGION = os.getenv('AWS_DEFAULT_REGION', 'us-east-1')
 dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
+sns = boto3.client('sns', region_name=AWS_REGION)
 
 # Table references
 books_table = dynamodb.Table('Books')
@@ -103,7 +104,30 @@ def scan_books_with_filter(filter_expression=None, limit=None):
     
     return items
 
+
+# ==================== SNS HELPER ====================
+
+def send_sns_notification(subject, message):
+    """Send SNS notification to configured topic."""
+    topic_arn = os.getenv('SNS_TOPIC_ARN')
+    if not topic_arn or 'YOUR_ACCOUNT_ID' in topic_arn:
+        print(f"⚠️ SNS Topic ARN not configured properly. Notification skipped.\nSubject: {subject}\nMessage: {message}")
+        return False
+    
+    try:
+        sns.publish(
+            TopicArn=topic_arn,
+            Subject=subject[:100],  # SNS subject limit
+            Message=message
+        )
+        print(f"✅ Message published to SNS: {topic_arn}")
+        return True
+    except Exception as e:
+        print(f"❌ Error sending SNS notification: {e}")
+        return False
+
 # ==================== PUBLIC ROUTES ====================
+
 
 @app.route('/')
 def index():
@@ -330,6 +354,10 @@ def contact():
         
         # TODO: Send email via AWS SNS
         if name and email and message:
+            # Send SNS Notification
+            msg_body = f"New Contact Inquiry\n\nName: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}"
+            send_sns_notification(f"Contact: {subject}" if subject else "New Contact Inquiry", msg_body)
+            
             return render_template('contact.html', success=True)
         else:
             return render_template('contact.html', error="Please fill in all required fields.")
@@ -999,6 +1027,14 @@ def place_order():
         
         # TODO: Send email via SNS
         print(f"📧 Order confirmation email would be sent to {email}")
+        
+        # Send order details via SNS
+        msg_subject = f"New Order Placed: {order_id}"
+        msg_body = f"Order ID: {order_id}\nCustomer: {full_name} ({email})\nAmount: ₹{float(total):.2f}\n\nItems:\n"
+        for item in cart_items:
+            msg_body += f"- {item['title']} (x{item['quantity']})\n"
+            
+        send_sns_notification(msg_subject, msg_body)
         
         return jsonify({
             'success': True,
