@@ -451,11 +451,11 @@ def admin_login():
         if not username or not password:
             return render_template('admin_login.html', error="Please enter both username and password.")
         
-        # Check admin credentials in database (Username or Email)
+        # Check admin credentials in database (Username or Email) (Case Insensitive)
         db = get_db()
         admin = db.execute(
-            'SELECT * FROM admins WHERE username = ? OR email = ?',
-            (username, username)
+            'SELECT * FROM admins WHERE LOWER(username) = ? OR LOWER(email) = ?',
+            (username.lower(), username.lower())
         ).fetchone()
         
         if admin and check_password_hash(admin['password_hash'], password):
@@ -537,7 +537,7 @@ def customer_dashboard():
             
             final_orders.append({
                 'id': row['order_id'],
-                'date': row['created_at'][:10],
+                'date': row['created_at'].strftime('%Y-%m-%d') if hasattr(row['created_at'], 'strftime') else str(row['created_at'])[:10],
                 'items': item_count,
                 'total': float(row['total']),
                 'status': row['status']
@@ -626,7 +626,7 @@ def admin_dashboard():
             orders.append({
                 'id': row['order_id'],
                 'customer': row['guest_name'], # Or fetch username if registered
-                'date': row['created_at'][:10],
+                'date': row['created_at'].strftime('%Y-%m-%d') if hasattr(row['created_at'], 'strftime') else str(row['created_at'])[:10],
                 'items': item_count,
                 'amount': float(row['total']),
                 'status': row['status']

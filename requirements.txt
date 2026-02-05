@@ -2,11 +2,8 @@ Flask
 boto3
 pandas
 flask-login
-flask_mail
-werkzeug
-datetime
-re
-sqlite3
+Flask-Mail
+Werkzeug
 python-dotenv
 Pillow
 moto[server]

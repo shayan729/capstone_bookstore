@@ -501,7 +501,7 @@ def admin_signup():
     """Admin registration."""
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
-        username = request.form.get('username', '').strip()
+        username = request.form.get('username', '').strip().lower()
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
@@ -551,7 +551,7 @@ def admin_signup():
 def admin_login():
     """Admin login."""
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
+        username = request.form.get('username', '').strip().lower()
         password = request.form.get('password', '')
         
         if not username or not password:
@@ -673,7 +673,7 @@ def customer_dashboard():
                  
                  final_orders.append({
                      'id': o.get('order_id'),
-                     'date': o.get('created_at')[:10], # ISO format YYYY-MM-DD
+                     'date': o.get('created_at').strftime('%Y-%m-%d') if hasattr(o.get('created_at'), 'strftime') else str(o.get('created_at', ''))[:10],
                      'items': item_count,
                      'total': float(o.get('total', 0)),
                      'status': o.get('status', 'Pending')
@@ -773,7 +773,7 @@ def admin_dashboard():
                  final_recent_orders.append({
                      'id': o.get('order_id'),
                      'customer': o.get('guest_name', 'Guest'),
-                     'date': o.get('created_at', '')[:10],
+                     'date': o.get('created_at').strftime('%Y-%m-%d') if hasattr(o.get('created_at'), 'strftime') else str(o.get('created_at', ''))[:10],
                      'items': item_count,
                      'amount': float(o.get('total', 0)),
                      'status': o.get('status', 'Pending')
