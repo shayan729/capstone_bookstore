@@ -3,3 +3,11 @@ id,order_id,isbn13,title,author,price,quantity,subtotal
 2,ORD-2026-FDAD2E33,9780310249870,Fanning the Flame,,467.0,1,467.0
 3,ORD-2026-DB08D0BC,9780312421977,This Side of Brightness,,451.0,1,451.0
 4,ORD-2026-DB08D0BC,9780451528209,Madame Bovary,,523.0,1,523.0
+5,ORD-2026-67A6030D,9780439554930,Harry Potter and the Sorcerer's Stone (Book 1),,459.0,1,459.0
+6,ORD-2026-67A6030D,9780439655484,Harry Potter and the Prisoner of Azkaban (Book 3),,516.5,1,516.5
+7,ORD-2026-67A6030D,9780618346257,The Fellowship of the Ring,,498.0,1,498.0
+8,ORD-2026-67A6030D,9780061122415,The Alchemist,,397.5,1,397.5
+9,ORD-2026-245F82F4,9780618260300,"The Hobbit, Or, There and Back Again",,482.0,1,482.0
+10,ORD-2026-245F82F4,9780439554930,Harry Potter and the Sorcerer's Stone (Book 1),,459.0,1,459.0
+11,ORD-2026-245F82F4,9780439064866,Harry Potter and the Chamber of Secrets (Book 2),,469.5,1,469.5
+12,ORD-2026-245F82F4,9780061122415,The Alchemist,,397.5,1,397.5

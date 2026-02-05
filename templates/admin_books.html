@@ -61,8 +61,8 @@
                                     {% endif %}
                             </td>
                             <td class="text-end pe-4">
-                                <button
-                                    onclick="deleteBook('{{ book.isbn }}', '{{ book.title|replace('\'', '\\\'') }}')"
+                                <button data-isbn="{{ book.isbn }}" data-title="{{ book.title }}"
+                                    onclick="deleteBook(this.dataset.isbn, this.dataset.title)"
                                     class="btn btn-sm btn-outline-danger" title="Delete">
                                     <i class="bi bi-trash"></i>
                                 </button>

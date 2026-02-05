@@ -9,3 +9,5 @@ re
 sqlite3
 python-dotenv
 Pillow
+moto[server]
+pytest
