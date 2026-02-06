@@ -10,6 +10,8 @@ from utils.category_mapper import get_display_categories, get_sql_conditions_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import re
+import boto3
+from botocore.exceptions import ClientError
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -701,7 +703,7 @@ def checkout():
 
 @app.route('/checkout/place-order', methods=['POST'])
 def place_order():
-    """Place order and send confirmation email."""
+    """Place order and send confirmation email via AWS SNS."""
     # Cart is a list of items in the session
     cart_items = session.get('cart', [])
     if not cart_items:
@@ -739,7 +741,8 @@ def place_order():
                 discount = coupon['value']
         
         shipping = 0 if subtotal > 500 else 50
-        if subtotal == 0: shipping = 0
+        if subtotal == 0: 
+            shipping = 0
             
         taxable_amount = max(0, subtotal - discount)
         tax = taxable_amount * 0.18
@@ -828,14 +831,119 @@ def place_order():
         session.pop('coupon', None)
         session.modified = True
         
-        # Send Email
+        # ============================================================
+        # Send Order Confirmation via AWS SNS
+        # ============================================================
         try:
-            msg = Message(f"Order Confirmation - {order_id}", recipients=[email])
-            msg.body = f"Thank you for your order, {full_name}!\n\nYour Order ID is {order_id}.\nTotal Amount: ₹{total:.2f}\n\nWe will ship your items shortly."
-            # mail.send(msg)
-            print(f"📧 Email sent to {email}")
+            # Initialize SNS client
+            sns_client = boto3.client('sns', region_name=os.getenv('AWS_DEFAULT_REGION', 'us-east-1'))
+            sns_topic_arn = os.getenv('SNS_TOPIC_ARN')
+            
+            if sns_topic_arn:
+                # Build order items list for email
+                items_text = "\n".join([
+                    f"  • {item['title']} x {item['quantity']} = ₹{item['price'] * item['quantity']:.2f}"
+                    for item in cart_items
+                ])
+                
+                # Construct email message
+                email_subject = f"Order Confirmation - {order_id}"
+                email_body = f"""Dear {full_name},
+
+Thank you for your order with BookStore Manager!
+
+════════════════════════════════════════════════════════════
+                    ORDER CONFIRMATION
+════════════════════════════════════════════════════════════
+
+Order ID: {order_id}
+Order Date: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+Order Status: Pending
+
+────────────────────────────────────────────────────────────
+ITEMS ORDERED:
+────────────────────────────────────────────────────────────
+{items_text}
+
+────────────────────────────────────────────────────────────
+ORDER SUMMARY:
+────────────────────────────────────────────────────────────
+Subtotal:        ₹{totals['subtotal']:.2f}
+Discount:       -₹{totals['discount']:.2f}
+Shipping:        ₹{totals['shipping']:.2f}
+Tax (GST 18%):   ₹{totals['tax']:.2f}
+────────────────────────────────────────────────────────────
+TOTAL:           ₹{totals['total']:.2f}
+════════════════════════════════════════════════════════════
+
+DELIVERY ADDRESS:
+{full_name}
+{address1}
+{address2 + ', ' if address2 else ''}{city}, {state} - {pincode}
+Phone: {phone}
+{f'Landmark: {landmark}' if landmark else ''}
+
+────────────────────────────────────────────────────────────
+ESTIMATED DELIVERY: 3-5 business days
+────────────────────────────────────────────────────────────
+
+You will receive a shipping confirmation email once your order 
+has been dispatched.
+
+If you have any questions, please contact our support team.
+
+Thank you for shopping with us!
+
+Best regards,
+BookStore Manager Team
+
+════════════════════════════════════════════════════════════
+This is an automated message. Please do not reply to this email.
+════════════════════════════════════════════════════════════
+"""
+                
+                # Publish to SNS Topic
+                response = sns_client.publish(
+                    TopicArn=sns_topic_arn,
+                    Subject=email_subject,
+                    Message=email_body,
+                    MessageAttributes={
+                        'order_id': {
+                            'DataType': 'String',
+                            'StringValue': order_id
+                        },
+                        'customer_email': {
+                            'DataType': 'String',
+                            'StringValue': email
+                        },
+                        'order_total': {
+                            'DataType': 'Number',
+                            'StringValue': str(totals['total'])
+                        }
+                    }
+                )
+                
+                message_id = response.get('MessageId')
+                print(f"✅ SNS notification sent successfully!")
+                print(f"   Message ID: {message_id}")
+                print(f"   Order ID: {order_id}")
+                print(f"   Customer: {full_name} ({email})")
+                
+            else:
+                print("⚠️  SNS_TOPIC_ARN not configured. Email notification skipped.")
+                print(f"   Order ID: {order_id} placed successfully without notification.")
+                
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error']['Message']
+            print(f"❌ SNS Error: {error_code} - {error_message}")
+            print(f"   Order {order_id} was placed but email notification failed.")
+            # Don't fail the order if email fails
+            
         except Exception as e:
-            print(f"Warning: Email failed: {e}")
+            print(f"⚠️  Email notification failed: {e}")
+            print(f"   Order {order_id} was placed successfully.")
+            # Don't fail the order if email fails
         
         return jsonify({
             'success': True,
@@ -845,7 +953,7 @@ def place_order():
         
     except Exception as e:
         db.rollback()
-        print(f"Error placing order: {e}")
+        print(f"❌ Error placing order: {e}")
         import traceback
         traceback.print_exc()
         
@@ -853,6 +961,7 @@ def place_order():
             'success': False,
             'message': 'Failed to place order. Please try again.'
         }), 500
+
 
 @app.template_filter('format_price')
 def format_price(value):

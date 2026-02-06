@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore ER Diagram</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .mermaid {
+            width: 100%;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mermaid">
+        erDiagram
+        USERS ||--o{ ORDERS : places
+        BOOKS ||--o{ ORDER_ITEMS : "included in"
+        ORDERS ||--o{ ORDER_ITEMS : contains
+        ORDERS ||--|| DELIVERY_ADDRESSES : "ships to"
+        ADMINS ||--|{ BOOKS : manages
+        ADMINS ||--|{ ORDERS : processes
+
+        USERS {
+        int id PK
+        string username "Unique"
+        string email "Unique"
+        string password_hash
+        string full_name
+        string role "default: customer"
+        datetime created_at
+        datetime last_login
+        }
+
+        ADMINS {
+        int id PK
+        string username "Unique"
+        string email "Unique"
+        string password_hash
+        string full_name
+        datetime created_at
+        datetime last_login
+        }
+
+        BOOKS {
+        int id PK "Auto Increment"
+        string isbn13 "Unique, Logical Key"
+        string isbn10
+        string title
+        string subtitle
+        string authors
+        string categories
+        string thumbnail
+        string description
+        real published_year
+        real average_rating
+        real num_pages
+        real ratings_count
+        real price
+        int stock
+        datetime created_at
+        }
+
+        ORDERS {
+        int id PK
+        string order_id "Unique, Logical Key"
+        int user_id FK "Nullable (Guest)"
+        string guest_email
+        string guest_name
+        string guest_phone
+        real subtotal
+        real discount
+        real shipping
+        real tax
+        real total
+        string coupon_code
+        string status "default: pending"
+        datetime created_at
+        }
+
+        ORDER_ITEMS {
+        int id PK
+        string order_id FK
+        string isbn13 FK
+        string title
+        string author
+        real price
+        int quantity
+        real subtotal
+        }
+
+        DELIVERY_ADDRESSES {
+        int id PK
+        string order_id FK
+        string full_name
+        string phone
+        string address_line1
+        string address_line2
+        string city
+        string state
+        string pincode
+        string landmark
+        }
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+
+</html>

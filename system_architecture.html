@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore System Architecture</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .mermaid {
+            width: 100%;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mermaid">
+        graph TD
+        User["👤 Client (Browser)"]
+        Admin["🛡️ Admin (Browser)"]
+
+        subgraph "AWS Cloud / Hosting Environment"
+        LB["🌐 Web Server (Flask)"]
+
+        subgraph "Application Logic"
+        Auth["🔐 Auth Module"]
+        Catalog["📚 Catalog Service"]
+        Cart["🛒 Cart Service"]
+        Checkout["💳 Checkout Service"]
+        Dashboard["📊 Admin Dashboard"]
+        end
+
+        subgraph "Data Persistence (AWS DynamoDB)"
+        DDB_Books[("Books Table")]
+        DDB_Users[("Users Table")]
+        DDB_Orders[("Orders Table")]
+        end
+
+        subgraph "External Services"
+        SNS["📢 Amazon SNS (Notifications)"]
+        end
+        end
+
+        %% Client Interactions
+        User -->|HTTP Requests| LB
+        Admin -->|HTTP Requests| LB
+
+        %% Routing
+        LB --> Auth
+        LB --> Catalog
+        LB --> Cart
+        LB --> Checkout
+        LB --> Dashboard
+
+        %% Data Access
+        Auth <-->|Read/Write| DDB_Users
+            Catalog <-->|Read| DDB_Books
+                Cart <-->|Read/Write| DDB_Books
+                    Checkout <-->|Read/Write| DDB_Orders
+                        Checkout -->|Publish| SNS
+                        Dashboard <-->|Read| DDB_Orders
+                            Dashboard <-->|Read/Write| DDB_Books
+
+                                %% Styling
+                                classDef aws fill:#FF9900,stroke:#232F3E,color:white;
+                                classDef db fill:#3F8624,stroke:#232F3E,color:white;
+                                classDef flask fill:#E1E1E1,stroke:#333,color:black;
+
+                                class DDB_Books,DDB_Users,DDB_Orders db;
+                                class SNS aws;
+                                class LB,Auth,Catalog,Cart,Checkout,Dashboard flask;
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+
+</html>
