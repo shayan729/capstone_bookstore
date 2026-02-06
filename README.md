@@ -19,7 +19,7 @@
     - Multi-step checkout process.
     - Saved delivery addresses.
     - Automated stock validation.
-    - **Email Notifications** for order confirmation.
+    - **Email Notifications** for order confirmation (via AWS SNS).
 - **User Dashboard**: View order history, recommendations, and account stats.
 
 ### 🛡️ For Administrators
@@ -33,8 +33,11 @@
 ## 🛠️ Technology Stack
 
 - **Backend**: Python, Flask
-- **Database**: SQLite
+- **Database**: 
+    - Local: SQLite
+    - Cloud: AWS DynamoDB
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Services**: AWS SNS (Notifications)
 - **Styling**: Bootstrap 5, Custom CSS
 - **Icons**: Bootstrap Icons, FontAwesome
 - **Templating**: Jinja2
@@ -72,6 +75,8 @@ BookSpot/
 ---
 
 ## ⚡ Getting Started
+
+For detailed setup instructions, including **AWS Configuration** and **DynamoDB Migration**, please refer to [RUN_INSTRUCTIONS.md](RUN_INSTRUCTIONS.md).
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -143,6 +148,8 @@ The SQLite database consists of the following key tables:
 - **orders**: Order summaries and status.
 - **order_items**: Line items linked to orders.
 - **delivery_addresses**: Shipping info for orders.
+
+*Note: When running in AWS mode, these tables are replicated in **DynamoDB** with appropriate partition/sort keys.*
 
 ---
 
