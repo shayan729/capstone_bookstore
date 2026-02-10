@@ -55,9 +55,15 @@ def migrate_table(sqlite_conn, dynamo_table, query, mapper_func):
     with dynamo_table.batch_writer() as batch:
         for row in rows:
             item = mapper_func(row)
+
+            # CRITICAL FIX: ensure partition key exists
+            if 'id' in item and item['id'] is None:
+                continue
+
             item = convert_float_to_decimal(item)
             item = {k: v for k, v in item.items() if v is not None}
             batch.put_item(Item=item)
+
 
     print(f"Completed migration for '{dynamo_table.name}'")
 
